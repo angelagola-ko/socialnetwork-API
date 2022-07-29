@@ -45,8 +45,21 @@ const thoughtSchema = new Schema (
         reactions: 
             //Array of nested documented created with the reactionSchema
             [reactionSchema]
+    },
+    {
+        toJSON: {
+            virtuals: true,
+            getters: true //timestamp
+        },
+        id: false
     }
-)
+    );
+    
+    // get total count of thoughts on retrieval
+    UserSchema.virtual('thoughtCount').get(function() {
+        return this.thought.length;
+    }
+);
 
 const Comment = model('Comment', CommentSchema);
 
