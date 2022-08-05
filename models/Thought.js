@@ -6,12 +6,14 @@ const reactionSchema = new Schema (
         reactionId: {
             //use mongoose's objectId date type
             //default value is set to a new objectId
+            type: Schema.Types.ObjectId,
+            default: () => new Types.ObjectId(),
 
         },
         reactionBody: {
             type: String,
             required: true,
-            //280 char max
+            maxLength: 280
         },
         username: {
             type: String,
@@ -22,16 +24,25 @@ const reactionSchema = new Schema (
             default: Date.now,
             get: createdAtVal => dateFormat(createdAtVal)
         }
+    },
+    {
+         toJSON: {
+            virtuals: true,
+            getters: true
+         },
+         id: false
     }
 )
-
-const thoughtSchema = new Schema (
+//thought schema
+const ThoughtSchema = new Schema (
     {
         thoughtText: {
             type: String,
             required: true,
             trim: true,
-            //between 1 and 280 char
+            minlength: 1,
+            maxlength: 280
+
         },
         createdAt: {
             type: Date,
@@ -56,11 +67,12 @@ const thoughtSchema = new Schema (
     );
     
     // get total count of thoughts on retrieval
-    UserSchema.virtual('thoughtCount').get(function() {
+    ThoughtSchema.virtual('thoughtCount').get(function() {
         return this.thought.length;
     }
 );
 
-const Comment = model('Comment', CommentSchema);
+//create the User model using the userschema
+const Thought = model('Thought', ThoughtSchema);
 
 module.exports = Thought;
