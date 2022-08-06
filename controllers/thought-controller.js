@@ -4,21 +4,22 @@ const thoughtController = {
     //get all thoughts
     getThought(req, res) {
         Thought.find({})
-        .then(dbUserData => res.json(dbUserData))
+        .then(dbThoughtData => res.json(dbThoughtData))
         .catch(err => {
             console.log(err);
             res.sendStatus(400).json(err);
+            return;
         })
     },
     getSingleThought(req,res) {
         Thought.findOne({ _id: req.params.thoughtId })
         .select("-__v")
-        .then(dbUserData => {
-            if(!dbUserData) {
+        .then(dbThoughtData => {
+            if(!dbThoughtData) {
                 res.status(404).json({ message: 'No thought with that id' })
                 return
             }
-            res.json(dbUserData)
+            res.json(dbThoughtData)
         })
         .catch(err => {
             console.log(err);
@@ -28,19 +29,20 @@ const thoughtController = {
     //create a thought and push the created toughts _id to the associated user's thoughts array field
     createThought(req,res) {
         Thought.create(req.body)
-        .then(({ _id }) => {
+        .then(( { username } ) => {//access to username
+            console.log(username);
             return User.findOneAndUpdate (
-                { _id: req.bosy.userId },
-                { $push: { thoughts: _id } },
+                { username: username },
+   //             { $push: { thoughts: username } },
                 { new: true }
             );
         })
-        .then(dbUserData => {
-            if(!dbUserData) {
+        .then(dbThoughtData => {
+            if(!dbThoughtData) {
                 res.status(404).json({ message: 'No user with that id' })
                 return
             }
-            res.json(dbUserData)
+            res.json(dbThoughtData)
         })
         .catch(err => {
             console.log(err);
@@ -82,17 +84,19 @@ const thoughtController = {
   },
   //create reaction
   createReaction(req, res) {
-    Thought.findOneAndUpdate(
-      { _id: req.params.thoughtId },
-      { $addToSet: { reactions: req.body } },
-      { runValidators: true, new: true }
-    )
-      .then((thought) =>
-        !thought
-          ? res.status(404).json({ message: "No thought frind with ID!" })
-          : res.json(thought)
-      )
-      .catch((err) => res.status(500).json(err));
+    console.log('Yo');
+    // Thought.findOneAndUpdate(
+    //   { _id: req.params.thoughtId },
+    //   { $addToSet: { reactions: req.body } },
+    //   { runValidators: true, new: true }
+    // )
+    //   .then((thought) =>
+    //     !thought
+    //       ? res.status(404).json({ message: "No thought frind with ID!" })
+    //       : res.json(thought)
+    //   )
+    //   .catch((err) => res.status(500).json(err));
+    res.json('Hi');
   },
   //delete reaction
   deleteReaction(req, res) {
@@ -110,3 +114,5 @@ const thoughtController = {
   },
 
 }
+
+module.exports = thoughtController;
